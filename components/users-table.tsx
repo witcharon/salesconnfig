@@ -147,8 +147,9 @@ export const columns: ColumnDef<UserWithSubscription>[] = [
     cell: ({ row }) => {
       const note = row.getValue("note") as string | null
       return (
-        <div className="max-w-[200px] truncate text-sm">
-          {note || "-"}
+        <div className="flex items-center gap-2">
+          <span className="max-w-[200px] truncate text-sm">{note || "-"}</span>
+          <EditUserNoteDialog user={row.original} />
         </div>
       )
     },
@@ -257,12 +258,7 @@ export const columns: ColumnDef<UserWithSubscription>[] = [
     header: "İşlemler",
     cell: ({ row }) => {
       const user = row.original
-      return (
-        <div className="flex items-center gap-2">
-          <EditUserNoteDialog user={user} />
-          <EditSubscriptionDialog user={user} />
-        </div>
-      )
+      return <EditSubscriptionDialog user={user} />
     },
   },
 ]
