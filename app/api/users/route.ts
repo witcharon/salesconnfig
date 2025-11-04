@@ -32,7 +32,7 @@ export async function GET() {
     // Users ve subscriptions'ı birleştir
     const usersWithSubscriptions = users.map((user) => {
       const subscription = subscriptions?.find(
-        (sub) => sub.auth_id === user.id
+        (sub) => sub.user_id === user.id
       ) || null
       return {
         ...user,

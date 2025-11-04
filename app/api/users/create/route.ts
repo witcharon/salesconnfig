@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     const { error: subscriptionError } = await supabase
       .from("user_subscriptions")
       .insert({
-        auth_id: authData.user.id,
+        user_id: authData.user.id,
         plan_id: "free",
         status: "active",
         language: "tr",

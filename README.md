@@ -102,7 +102,7 @@ Uygulama [http://localhost:3000](http://localhost:3000) adresinde çalışacakt�
 ### public.user_subscriptions
 
 - `id` (UUID, PRIMARY KEY)
-- `auth_id` (UUID, FOREIGN KEY) - auth.users.id ile eşleşir
+- `user_id` (UUID, FOREIGN KEY) - auth.users.id ile eşleşir
 - `plan_id` (TEXT) - 'free', 'pro', 'team'
 - `status` (TEXT) - 'active', 'deactive'
 - `current_period_end` (TIMESTAMPTZ) - Lisans bitiş tarihi

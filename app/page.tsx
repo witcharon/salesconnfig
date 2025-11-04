@@ -18,15 +18,22 @@ async function getUsers(): Promise<UserWithSubscription[]> {
   }
 
   // Subscriptions bilgilerini çek
-  const { data: subscriptions } = await serviceSupabase
+  const { data: subscriptions, error: subscriptionsError } = await serviceSupabase
     .from("user_subscriptions")
     .select("*")
 
+  if (subscriptionsError) {
+    console.error("Subscriptions fetch error:", subscriptionsError)
+    // Hata durumunda boş array döndür, uygulama çalışmaya devam etsin
+  }
+
   // Users ve subscriptions'ı birleştir
+  // user_id ile users.id eşleştirmesi yapılıyor
   const usersWithSubscriptions: UserWithSubscription[] = users.map((user) => {
     const subscription = subscriptions?.find(
-      (sub) => sub.auth_id === user.id
+      (sub) => sub.user_id === user.id
     ) || null
+    
     return {
       ...user,
       subscription,

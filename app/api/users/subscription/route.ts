@@ -4,11 +4,11 @@ import { createServiceRoleClient } from "@/lib/supabase/server"
 export async function PUT(request: Request) {
   try {
     const body = await request.json()
-    const { auth_id, ...updateData } = body
+    const { user_id, ...updateData } = body
 
-    if (!auth_id) {
+    if (!user_id) {
       return NextResponse.json(
-        { error: "auth_id gereklidir" },
+        { error: "user_id gereklidir" },
         { status: 400 }
       )
     }
@@ -18,7 +18,7 @@ export async function PUT(request: Request) {
     const { data, error } = await supabase
       .from("user_subscriptions")
       .update(updateData)
-      .eq("auth_id", auth_id)
+      .eq("user_id", user_id)
       .select()
       .single()
 

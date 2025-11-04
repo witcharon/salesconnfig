@@ -10,7 +10,7 @@ export type User = {
 
 export type UserSubscription = {
   id: string
-  auth_id: string
+  user_id: string
   plan_id: "free" | "pro" | "team"
   status: "active" | "deactive"
   current_period_end: string | null

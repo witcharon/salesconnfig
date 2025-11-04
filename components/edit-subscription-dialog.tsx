@@ -83,7 +83,7 @@ export function EditSubscriptionDialog({ user }: EditSubscriptionDialogProps) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          auth_id: user.id,
+          user_id: user.id,
           ...data,
           current_period_end: data.current_period_end || null,
           logo: data.logo || null,

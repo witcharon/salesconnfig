@@ -127,13 +127,14 @@ export const columns: ColumnDef<UserWithSubscription>[] = [
         pro: "default",
         team: "default",
       } as const
+      const planText = subscription.plan_id === "free"
+        ? "Free"
+        : subscription.plan_id === "pro"
+        ? "Pro"
+        : "Team"
       return (
         <Badge variant={planColors[subscription.plan_id] || "secondary"}>
-          {subscription.plan_id === "free"
-            ? "Free"
-            : subscription.plan_id === "pro"
-            ? "Pro"
-            : "Team"}
+          {planText || "-"}
         </Badge>
       )
     },
@@ -144,9 +145,10 @@ export const columns: ColumnDef<UserWithSubscription>[] = [
     cell: ({ row }) => {
       const subscription = row.original.subscription
       if (!subscription) return <div>-</div>
+      const statusText = subscription.status === "active" ? "Aktif" : "Pasif"
       return (
         <Badge variant={subscription.status === "active" ? "default" : "secondary"}>
-          {subscription.status === "active" ? "Aktif" : "Pasif"}
+          {statusText || "-"}
         </Badge>
       )
     },
@@ -170,7 +172,7 @@ export const columns: ColumnDef<UserWithSubscription>[] = [
     cell: ({ row }) => {
       const subscription = row.original.subscription
       if (!subscription) return <div>-</div>
-      return <div className="uppercase">{subscription.language}</div>
+      return <div className="uppercase">{subscription.language || "-"}</div>
     },
   },
   {
@@ -190,9 +192,10 @@ export const columns: ColumnDef<UserWithSubscription>[] = [
     cell: ({ row }) => {
       const subscription = row.original.subscription
       if (!subscription) return <div>-</div>
+      const crmText = subscription.is_crm ? "Aktif" : "Pasif"
       return (
         <Badge variant={subscription.is_crm ? "default" : "secondary"}>
-          {subscription.is_crm ? "Aktif" : "Pasif"}
+          {crmText || "-"}
         </Badge>
       )
     },
@@ -203,9 +206,10 @@ export const columns: ColumnDef<UserWithSubscription>[] = [
     cell: ({ row }) => {
       const subscription = row.original.subscription
       if (!subscription) return <div>-</div>
+      const campaignText = subscription.is_campaign ? "Aktif" : "Pasif"
       return (
         <Badge variant={subscription.is_campaign ? "default" : "secondary"}>
-          {subscription.is_campaign ? "Aktif" : "Pasif"}
+          {campaignText || "-"}
         </Badge>
       )
     },
