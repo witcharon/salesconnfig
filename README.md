@@ -39,14 +39,32 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_secret
 ```
 
-### 3. Supabase Migration
+### 3. Supabase Migration (ÖNEMLİ!)
 
-Supabase SQL Editor'da `supabase-migration.sql` dosyasındaki SQL'i çalıştırın. Bu işlem:
+**Migration mutlaka çalıştırılmalıdır!** `public.users` tablosu otomatik oluşturulmaz.
 
-- `public.users` tablosunu oluşturur
+#### Yöntem 1: Supabase SQL Editor (Önerilen)
+
+1. Supabase Dashboard'a gidin: https://supabase.com/dashboard
+2. Projenizi seçin
+3. Sol menüden **SQL Editor**'ı açın
+4. `supabase-migration.sql` dosyasının içeriğini kopyalayın
+5. SQL Editor'a yapıştırın ve **Run** butonuna tıklayın
+
+Bu işlem:
+- `public.users` tablosunu oluşturur (auth.users ile sync için)
 - `public.user_subscriptions` tablosunu oluşturur
-- Trigger'ları ve RLS politikalarını ayarlar
+- Trigger'ları ayarlar (auth.users'dan public.users'a otomatik sync)
+- RLS politikalarını ayarlar
 - Mevcut auth.users kayıtlarını public.users'a kopyalar
+
+#### Yöntem 2: Migration Kontrol Script'i
+
+```bash
+npm run migrate:check
+```
+
+Bu script migration durumunu kontrol eder ve gerekli SQL'i gösterir.
 
 ### 4. İlk Super Admin Kullanıcısı
 
