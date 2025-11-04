@@ -1,36 +1,113 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Connfig Sales
 
-## Getting Started
+Connfig uygulaması için kullanıcı yönetim ve demo süresi takip uygulaması.
 
-First, run the development server:
+## Özellikler
+
+- 🔐 Super admin girişi (sadece `is_super_admin=true` olan kullanıcılar giriş yapabilir)
+- 👥 Kullanıcı listesi ve detaylı görüntüleme
+- 📊 Kullanıcı abonelik bilgileri yönetimi
+- ➕ Yeni kullanıcı oluşturma (mail onaylı)
+- ✏️ Abonelik bilgilerini düzenleme
+- 🌓 Dark/Light mode desteği
+- 📱 Responsive tasarım
+
+## Teknolojiler
+
+- **Next.js 16** - React framework
+- **TypeScript** - Type safety
+- **Tailwind CSS** - Styling
+- **shadcn/ui** - UI components
+- **Supabase** - Database & Authentication
+- **TanStack Table** - Data table
+
+## Kurulum
+
+### 1. Bağımlılıkları yükleyin
+
+```bash
+npm install
+```
+
+### 2. Environment Variables
+
+`.env.local` dosyası oluşturun ve aşağıdaki değişkenleri ekleyin:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_secret
+```
+
+### 3. Supabase Migration
+
+Supabase SQL Editor'da `supabase-migration.sql` dosyasındaki SQL'i çalıştırın. Bu işlem:
+
+- `public.users` tablosunu oluşturur
+- `public.user_subscriptions` tablosunu oluşturur
+- Trigger'ları ve RLS politikalarını ayarlar
+- Mevcut auth.users kayıtlarını public.users'a kopyalar
+
+### 4. İlk Super Admin Kullanıcısı
+
+Supabase SQL Editor'da ilk super admin kullanıcısını oluşturun:
+
+```sql
+-- Önce auth.users'da kullanıcı oluşturun (Supabase Dashboard'dan veya API ile)
+-- Sonra public.users tablosunda is_super_admin'i true yapın:
+
+UPDATE public.users 
+SET is_super_admin = TRUE 
+WHERE email = 'admin@example.com';
+```
+
+### 5. Development Server'ı Başlatın
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Uygulama [http://localhost:3000](http://localhost:3000) adresinde çalışacaktır.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Veritabanı Yapısı
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### public.users
 
-## Learn More
+- `id` (UUID, PRIMARY KEY) - auth.users ile eşleşir
+- `email` (VARCHAR) - Kullanıcı e-postası
+- `phone` (TEXT) - Telefon numarası
+- `created_at` (TIMESTAMPTZ) - Oluşturulma tarihi
+- `updated_at` (TIMESTAMPTZ) - Güncelleme tarihi
+- `last_sign_in_at` (TIMESTAMPTZ) - Son giriş tarihi
+- `is_super_admin` (BOOLEAN) - Super admin yetkisi
 
-To learn more about Next.js, take a look at the following resources:
+### public.user_subscriptions
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `id` (UUID, PRIMARY KEY)
+- `auth_id` (UUID, FOREIGN KEY) - auth.users.id ile eşleşir
+- `plan_id` (TEXT) - 'free', 'pro', 'team'
+- `status` (TEXT) - 'active', 'deactive'
+- `current_period_end` (TIMESTAMPTZ) - Lisans bitiş tarihi
+- `language` (TEXT) - 'tr', 'en'
+- `logo` (TEXT) - Logo URL
+- `is_crm` (BOOLEAN) - CRM modülü aktif/pasif
+- `is_campaign` (BOOLEAN) - Campaign modülü aktif/pasif
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Kullanım
 
-## Deploy on Vercel
+1. **Giriş Yap**: `/login` sayfasından super admin hesabıyla giriş yapın
+2. **Kullanıcıları Görüntüle**: Anasayfada tüm kullanıcılar ve abonelik bilgileri görüntülenir
+3. **Yeni Kullanıcı Oluştur**: Sağ üstteki "Kullanıcı Oluştur" butonunu kullanın
+4. **Abonelik Düzenle**: Her kullanıcının satırındaki kalem ikonuna tıklayarak abonelik bilgilerini düzenleyin
+5. **Tema Değiştir**: Sağ üstteki tema butonu ile dark/light mode arasında geçiş yapın
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Güvenlik
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Sadece `is_super_admin=true` olan kullanıcılar uygulamaya erişebilir
+- RLS (Row Level Security) politikaları aktif
+- Service role key sadece server-side işlemlerde kullanılır
+- Middleware ile her istekte authentication ve yetki kontrolü yapılır
+
+## Lisans
+
+Bu proje özel kullanım içindir.
