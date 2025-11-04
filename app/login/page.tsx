@@ -54,14 +54,24 @@ export default function LoginPage() {
         return
       }
 
-      // is_super_admin kontrolü
-      const { data: userData, error: userError } = await supabase
-        .from("users")
-        .select("is_super_admin")
-        .eq("id", authData.user.id)
-        .single()
+      // Cookie'lerin set edilmesi için kısa bir bekleme
+      await new Promise((resolve) => setTimeout(resolve, 500))
 
-      if (userError || !userData?.is_super_admin) {
+      // is_super_admin kontrolü - API route kullanarak RLS bypass
+      const checkResponse = await fetch("/api/auth/check-admin", {
+        credentials: "include",
+      })
+      
+      if (!checkResponse.ok) {
+        await supabase.auth.signOut()
+        setError("Bu uygulamaya erişim yetkiniz bulunmamaktadır")
+        setLoading(false)
+        return
+      }
+
+      const checkData = await checkResponse.json()
+
+      if (!checkData.is_super_admin) {
         await supabase.auth.signOut()
         setError("Bu uygulamaya erişim yetkiniz bulunmamaktadır")
         setLoading(false)
