@@ -3,6 +3,10 @@ import { UsersTable } from "@/components/users-table"
 import { Header } from "@/components/header"
 import type { UserWithSubscription } from "@/types/database"
 
+// Cache'i devre dışı bırak - veriler her zaman fresh olsun
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
 async function getUsers(): Promise<UserWithSubscription[]> {
   // Middleware zaten is_super_admin kontrolünü yapıyor, burada tekrar kontrol etmeye gerek yok
   // Service role client ile direkt kullanıcıları çek

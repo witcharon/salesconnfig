@@ -99,7 +99,10 @@ export function EditSubscriptionDialog({ user }: EditSubscriptionDialogProps) {
       }
 
       setOpen(false)
+      // Cache'i bypass et ve sayfayı yenile
       router.refresh()
+      // Ekstra güvenlik için window.location kullan
+      window.location.reload()
     } catch (err) {
       setError("Bir hata oluştu. Lütfen tekrar deneyin.")
       setLoading(false)

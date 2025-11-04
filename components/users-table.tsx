@@ -39,8 +39,33 @@ import {
 import { Badge } from "@/components/ui/badge"
 import type { UserWithSubscription } from "@/types/database"
 import { EditSubscriptionDialog } from "./edit-subscription-dialog"
+import { EditUserNoteDialog } from "./edit-user-note-dialog"
+import { EditCompanyNameDialog } from "./edit-company-name-dialog"
 
 export const columns: ColumnDef<UserWithSubscription>[] = [
+  {
+    accessorKey: "company_name",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Şirket Adı
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+    cell: ({ row }) => {
+      const companyName = row.getValue("company_name") as string | null
+      return (
+        <div className="flex items-center gap-2">
+          <span className="max-w-[200px] truncate">{companyName || "-"}</span>
+          <EditCompanyNameDialog user={row.original} />
+        </div>
+      )
+    },
+  },
   {
     accessorKey: "email",
     header: ({ column }) => {
@@ -113,6 +138,18 @@ export const columns: ColumnDef<UserWithSubscription>[] = [
       const id = row.getValue("id") as string
       return (
         <div className="font-mono text-xs max-w-[200px] truncate">{id}</div>
+      )
+    },
+  },
+  {
+    accessorKey: "note",
+    header: "Not",
+    cell: ({ row }) => {
+      const note = row.getValue("note") as string | null
+      return (
+        <div className="max-w-[200px] truncate text-sm">
+          {note || "-"}
+        </div>
       )
     },
   },
@@ -217,9 +254,15 @@ export const columns: ColumnDef<UserWithSubscription>[] = [
   {
     id: "actions",
     enableHiding: false,
+    header: "İşlemler",
     cell: ({ row }) => {
       const user = row.original
-      return <EditSubscriptionDialog user={user} />
+      return (
+        <div className="flex items-center gap-2">
+          <EditUserNoteDialog user={user} />
+          <EditSubscriptionDialog user={user} />
+        </div>
+      )
     },
   },
 ]
@@ -228,11 +271,38 @@ interface UsersTableProps {
   data: UserWithSubscription[]
 }
 
+const COLUMN_VISIBILITY_STORAGE_KEY = "users-table-column-visibility"
+
 export function UsersTable({ data }: UsersTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
+  
+  // localStorage'dan column visibility ayarlarını yükle
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem(COLUMN_VISIBILITY_STORAGE_KEY)
+      if (saved) {
+        try {
+          return JSON.parse(saved)
+        } catch {
+          return {}
+        }
+      }
+    }
+    return {}
+  })
+  
   const [rowSelection, setRowSelection] = React.useState({})
+
+  // Column visibility değiştiğinde localStorage'a kaydet
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem(
+        COLUMN_VISIBILITY_STORAGE_KEY,
+        JSON.stringify(columnVisibility)
+      )
+    }
+  }, [columnVisibility])
 
   const table = useReactTable({
     data,

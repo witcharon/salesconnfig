@@ -6,6 +6,8 @@ export type User = {
   updated_at: string | null
   last_sign_in_at: string | null
   is_super_admin: boolean
+  note: string | null
+  company_name: string | null
 }
 
 export type UserSubscription = {
