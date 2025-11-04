@@ -35,8 +35,34 @@ export async function middleware(request: NextRequest) {
   // Login sayfası için kontrol
   if (request.nextUrl.pathname === '/login') {
     if (user) {
-      // Kullanıcı giriş yapmışsa anasayfaya yönlendir
-      return NextResponse.redirect(new URL('/', request.url))
+      // Kullanıcı giriş yapmışsa is_super_admin kontrolü yap
+      try {
+        const serviceSupabase = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.SUPABASE_SERVICE_ROLE_KEY!,
+          {
+            auth: {
+              autoRefreshToken: false,
+              persistSession: false,
+            },
+          }
+        )
+
+        const { data: userData, error } = await serviceSupabase
+          .from('users')
+          .select('is_super_admin')
+          .eq('id', user.id)
+          .single()
+
+        // Super admin ise anasayfaya yönlendir
+        if (!error && userData?.is_super_admin) {
+          return NextResponse.redirect(new URL('/', request.url))
+        }
+        // Super admin değilse login sayfasında kal (signOut yapılacak)
+      } catch (err) {
+        console.error('Login page middleware error:', err)
+        // Hata durumunda login sayfasında kal
+      }
     }
     return supabaseResponse
   }
@@ -48,25 +74,38 @@ export async function middleware(request: NextRequest) {
 
   // is_super_admin kontrolü - Service role kullanarak RLS bypass
   // Middleware'de service role kullanmak güvenli çünkü sadece kontrol için kullanılıyor
-  const serviceSupabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      },
+  try {
+    const serviceSupabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+        },
+      }
+    )
+
+    const { data: userData, error } = await serviceSupabase
+      .from('users')
+      .select('is_super_admin')
+      .eq('id', user.id)
+      .single()
+
+    // Hata durumunda veya super admin değilse login sayfasına yönlendir
+    if (error) {
+      console.error('Middleware user check error:', error)
+      // Login'e yönlendir (login sayfasında signOut yapılacak)
+      return NextResponse.redirect(new URL('/login', request.url))
     }
-  )
 
-  const { data: userData, error } = await serviceSupabase
-    .from('users')
-    .select('is_super_admin')
-    .eq('id', user.id)
-    .single()
-
-  if (error || !userData?.is_super_admin) {
-    // Super admin değilse login sayfasına yönlendir
+    if (!userData?.is_super_admin) {
+      // Super admin değilse login'e yönlendir (login sayfasında signOut yapılacak)
+      return NextResponse.redirect(new URL('/login', request.url))
+    }
+  } catch (err) {
+    console.error('Middleware error:', err)
+    // Hata durumunda login'e yönlendir
     return NextResponse.redirect(new URL('/login', request.url))
   }
 

@@ -1,32 +1,11 @@
-import { createServerComponentClient, createServiceRoleClient } from "@/lib/supabase/server"
-import { redirect } from "next/navigation"
+import { createServiceRoleClient } from "@/lib/supabase/server"
 import { UsersTable } from "@/components/users-table"
 import { Header } from "@/components/header"
 import type { UserWithSubscription } from "@/types/database"
 
 async function getUsers(): Promise<UserWithSubscription[]> {
-  const supabase = await createServerComponentClient()
-  
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect("/login")
-  }
-
-  // is_super_admin kontrolü
-  const { data: userData, error: userError } = await supabase
-    .from("users")
-    .select("is_super_admin")
-    .eq("id", user.id)
-    .single()
-
-  if (userError || !userData?.is_super_admin) {
-    redirect("/login")
-  }
-
-  // Service role client ile kullanıcıları çek
+  // Middleware zaten is_super_admin kontrolünü yapıyor, burada tekrar kontrol etmeye gerek yok
+  // Service role client ile direkt kullanıcıları çek
   const serviceSupabase = createServiceRoleClient()
 
   const { data: users, error: usersError } = await serviceSupabase

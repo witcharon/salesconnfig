@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -19,7 +18,6 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>
 
 export default function LoginPage() {
-  const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const supabase = createClientComponentClient()
@@ -78,8 +76,8 @@ export default function LoginPage() {
         return
       }
 
-      router.push("/")
-      router.refresh()
+      // Full page reload ile middleware'in kontrol etmesini sağla
+      window.location.href = "/"
     } catch (err) {
       setError("Bir hata oluştu. Lütfen tekrar deneyin.")
       setLoading(false)
