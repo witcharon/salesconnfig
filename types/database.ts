@@ -22,7 +22,16 @@ export type UserSubscription = {
   is_campaign: boolean
 }
 
+export type LeadGenUserData = {
+  id: string // user uuid
+  created_at: string | null
+  update_at: string | null
+  lead_gen_count: number | null
+  is_scraping: boolean | null
+}
+
 export type UserWithSubscription = User & {
   subscription: UserSubscription | null
+  leadGenData: LeadGenUserData | null
 }
 

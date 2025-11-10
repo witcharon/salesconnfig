@@ -253,6 +253,88 @@ export const columns: ColumnDef<UserWithSubscription>[] = [
     },
   },
   {
+    id: "lead_gen_created_at",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          İlk Kazıma Tarihi
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+    cell: ({ row }) => {
+      const leadGenData = row.original.leadGenData
+      if (!leadGenData || !leadGenData.created_at) return <div>-</div>
+      return (
+        <div>
+          {format(new Date(leadGenData.created_at), "dd MMM yyyy HH:mm", { locale: tr })}
+        </div>
+      )
+    },
+  },
+  {
+    id: "lead_gen_update_at",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Son Kazıma Tarihi
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+    cell: ({ row }) => {
+      const leadGenData = row.original.leadGenData
+      if (!leadGenData || !leadGenData.update_at) return <div>-</div>
+      return (
+        <div>
+          {format(new Date(leadGenData.update_at), "dd MMM yyyy HH:mm", { locale: tr })}
+        </div>
+      )
+    },
+  },
+  {
+    id: "lead_gen_count",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Toplam Kazıma
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+    cell: ({ row }) => {
+      const leadGenData = row.original.leadGenData
+      if (!leadGenData || leadGenData.lead_gen_count === null) return <div>-</div>
+      return (
+        <div className="font-medium">
+          {leadGenData.lead_gen_count.toLocaleString("tr-TR")}
+        </div>
+      )
+    },
+  },
+  {
+    id: "is_scraping",
+    header: "Kazıma Durumu",
+    cell: ({ row }) => {
+      const leadGenData = row.original.leadGenData
+      if (!leadGenData || leadGenData.is_scraping === null) return <div>-</div>
+      return (
+        <Badge variant={leadGenData.is_scraping ? "default" : "secondary"}>
+          {leadGenData.is_scraping ? "Aktif" : "Pasif"}
+        </Badge>
+      )
+    },
+  },
+  {
     id: "actions",
     enableHiding: false,
     header: "İşlemler",

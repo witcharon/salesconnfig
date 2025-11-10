@@ -31,16 +31,30 @@ async function getUsers(): Promise<UserWithSubscription[]> {
     // Hata durumunda boş array döndür, uygulama çalışmaya devam etsin
   }
 
-  // Users ve subscriptions'ı birleştir
-  // user_id ile users.id eşleştirmesi yapılıyor
+  // Lead gen user data bilgilerini çek
+  const { data: leadGenData, error: leadGenError } = await serviceSupabase
+    .from("lead_gen_user_data")
+    .select("*")
+
+  if (leadGenError) {
+    console.error("Lead gen data fetch error:", leadGenError)
+    // Hata durumunda boş array döndür, uygulama çalışmaya devam etsin
+  }
+
+  // Users, subscriptions ve lead gen data'yı birleştir
   const usersWithSubscriptions: UserWithSubscription[] = users.map((user) => {
     const subscription = subscriptions?.find(
       (sub) => sub.user_id === user.id
     ) || null
     
+    const leadGen = leadGenData?.find(
+      (lg) => lg.id === user.id
+    ) || null
+    
     return {
       ...user,
       subscription,
+      leadGenData: leadGen,
     }
   })
 
